@@ -9,9 +9,9 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use(cors({
-    origin: "https://resume-ai-backend-dh0x.onrender.com",
-    credentials: true
-}))
+  origin: "https://resume-ai-frontend-server.vercel.app",
+  credentials: true
+}));
 
 const authRouter = require("./routes/auth.routes")                                            // require all the route here 
 const interviewRouter = require("./routes/interview.routes")
