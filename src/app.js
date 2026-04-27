@@ -5,6 +5,9 @@ const cors = require("cors")
 
 const app = express()
 
+// Trust proxy to correctly detect HTTPS in production (Render, Heroku, etc.)
+app.set('trust proxy', 1)
+
 app.use(express.json())
 app.use(cookieParser())
 

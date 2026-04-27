@@ -1,52 +1,40 @@
-// for identify the user
-const jwt = require ("jsonwebtoken") 
-
-// For checking the token that is it blacklisted
+const jwt = require("jsonwebtoken")
 const tokenBlacklistModel = require("../models/blacklisting.model")
 
-
-
-
 async function authUser(req, res, next) {
-const token = req.cookies.token                                                               // / Fetching token from the cookies
+    try {
+        // Log to check if cookies are reaching the server
+        console.log("🔍 Auth Middleware - Cookies received:", req.cookies)
+        console.log("🔍 Auth Middleware - Request origin:", req.get('origin'))
+        console.log("🔍 Auth Middleware - Headers:", req.headers)
+        
+        const token = req.cookies.token
 
-// <---If there is no token in that case--->
-if (!token) {
-        return res.status(401).json({
-            message: "Token not provided."
-        })
-    }
+        if (!token) {
+            console.log("❌ No token found in cookies")
+            return res.status(401).json({
+                message: "Token not provided."
+            })
+        }
 
+        console.log("✅ Token found, verifying...")
+        const isTokenBlacklisted = await tokenBlacklistModel.findOne({ token })
+        if (isTokenBlacklisted) {
+            console.log("❌ Token is blacklisted")
+            return res.status(401).json({
+                message: "token is invalid"
+            })
+        }
 
-    // Checking token Blackisting
-     const isTokenBlacklisted = await tokenBlacklistModel.findOne({
-        token
-    })
-    if (isTokenBlacklisted) {
-        return res.status(401).json({
-            message: "token is invalid"
-        })
-    }
-
-
-
-    // <-----If there is token:----->
-                                                                                                // note : verify is method to identify the correctness of the token by taking token and JWT_SECRET in args
-                                                                                               // in try, verify the  available token and if it correct then use next() unless use catch 
-
-        try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-
+        console.log("✅ Token verified, user ID:", decoded.id)
         req.user = decoded
-
         next()
-
     } catch (err) {
-
+        console.error("❌ AUTH ERROR:", err.message)
         return res.status(401).json({
             message: "Invalid token."
         })
     }
-
 }
 module.exports = { authUser }

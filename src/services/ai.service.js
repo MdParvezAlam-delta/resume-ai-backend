@@ -10,7 +10,7 @@ const genAI = new GoogleGenAI({
 // Reusable helper
 async function generateContent({ prompt, config = {} }) {
   const result = await genAI.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-2.5-flash",
     contents: prompt,
     config: {
       responseMimeType: "application/json",
